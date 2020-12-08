@@ -9,27 +9,28 @@
 <h2 style="text-align:center;font-family:serif">Created by: <br /> Zaidan Fadhlurohman Faruq & Daniel Stephen</h2>
 <p style="text-align:center;font-family:serif">Drag to move the ball</p>
 
+<h4 id="dis">Distance between charges = 0</h4>
+<h4 id="force">Force between charges = 0</h4>
+
 	<canvas id="myCanvas" width="800" height="400" style="border:1px solid #d3d3d3; background:#ffffff">
 Your browser does not support the HTML canvas tag.</canvas>
 
 <div style="float: center">
 <p style="text-align:center;font-family:serif">Charge on charge no. 1</p>
-<select id="circle1" onchange="circle1()" style="text-align:center;font-family:serif">
-  <option value="#ff0000">+10 &mu;C</option>
-  <option value="#ffffff">0 &mu;C</option>
-  <option value="#0000ff">-10 &mu;C</option>
+<select id="circle1" style="text-align:center;font-family:serif">
+  <option value="1" selected="selected">+10 &mu;C</option>
+  <option value="2">0 &mu;C</option>
+  <option value="3">-10 &mu;C</option>
 </select>
 
 <p style="text-align:center;font-family:serif">Charge on charge no. 2</p>
-<select id="circle2" onchange="circle2()" style="text-align:center;font-family:serif">
-  <option value="#ff0000">+10 &mu;C</option>
-  <option value="#ffffff">0 &mu;C</option>
-  <option value="#0000ff">-10 &mu;C</option>
+<select id="circle2" style="text-align:center;font-family:serif">
+  <option value="1">+10 &mu;C</option>
+  <option value="2">0 &mu;C</option>
+  <option value="3" selected="selected">-10 &mu;C</option>
 </select>
 </div>
 
-<h4 id="dis">Distance between charges = 0</h4>
-<h4 id="force">Force between charges = 0</h4>
 
 <script>
 var c = document.getElementById("myCanvas");
@@ -56,6 +57,40 @@ c.onmousemove = myMove;
 
 // call to draw the scene
 draw();
+
+var circle1 = document.getElementById("circle1");
+var value1 = circle1.value
+var circle2 = document.getElementById("circle2");
+var value2 = circle2.value
+var coulomb1;
+var coulomb2;
+
+if (value1 == 1) {
+selectElement('circle1','1');
+coulomb1 = 0.00000001;
+} else if (value1 == 2) {
+selectElement('circle1','2');
+coulomb1 = 0;
+} else if (value1 == 3) {
+selectElement('circle1','3');
+coulomb1 = -0.00000001;
+} 
+
+if (value2 == 1) {
+selectElement('circle2','1');
+coulomb2 = 0.00000001;
+} else if (value2 == 2) {
+selectElement('circle2','2');
+coulomb2 = 0;
+} else if (value2 == 3) {
+selectElement('circle2','3');
+coulomb2 = -0.00000001;
+} 
+
+function selectElement(id, valueToSelect) {    
+    let element = document.getElementById(id);
+    element.value = valueToSelect;
+}
 
 function circle(c) {
   ctx.fillStyle=c.fill;
@@ -211,6 +246,8 @@ function myMove(e){
     draw();
 	//update distance in HTML
 	distance();
+	
+	force(coulomb1, coulomb2);
 	
     // reset the starting mouse position for the next mousemove
     startX=mx;
