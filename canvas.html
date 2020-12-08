@@ -1,16 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Canvas</title>
+	<title>Electric Charge Simulator</title>
 </head>
 <body style="text-align:center">
 
 <h1 style="text-align:center;font-family:serif">Simulation of Electric charge between two particle</h1>
+<h2 style="text-align:center;font-family:serif">Created by: <br /> Zaidan Fadhlurohman Faruq & Daniel Stephen</h2>
+<p style="text-align:center;font-family:serif">Drag to move the ball</p>
 
-	<canvas id="myCanvas" width="800" height="400" style="border:1px solid #d3d3d3;">
+	<canvas id="myCanvas" width="800" height="400" style="border:1px solid #d3d3d3; background:#ffffff">
 Your browser does not support the HTML canvas tag.</canvas>
 
+<div style="float: center">
+<p style="text-align:center;font-family:serif">Charge on charge no. 1</p>
+<select id="circle1" onchange="circle1()" style="text-align:center;font-family:serif">
+  <option value="#ff0000">+10 &mu;C</option>
+  <option value="#ffffff">0 &mu;C</option>
+  <option value="#0000ff">-10 &mu;C</option>
+</select>
 
+<p style="text-align:center;font-family:serif">Charge on charge no. 2</p>
+<select id="circle2" onchange="circle2()" style="text-align:center;font-family:serif">
+  <option value="#ff0000">+10 &mu;C</option>
+  <option value="#ffffff">0 &mu;C</option>
+  <option value="#0000ff">-10 &mu;C</option>
+</select>
+</div>
+
+<h4 id="dis">Distance between charges = 0</h4>
+<h4 id="force">Force between charges = 0</h4>
 
 <script>
 var c = document.getElementById("myCanvas");
@@ -27,8 +46,8 @@ var startX;
 
 var shapes = [];
 
-shapes.push({x:500,y:300,r:30,fill:"#094BFF",isDragging:false,text: '-'});
-shapes.push({x:150,y:300,r:30,fill:"#FF0909",isDragging:false,text: '+'});
+shapes.push({x:150,y:300,r:30,fill:"#FF0000",isDragging:false,text: '+'});
+shapes.push({x:500,y:300,r:30,fill:"#0000FF",isDragging:false,text: '-'});
 
 // listen for mouse events
 c.onmousedown = myDown;
@@ -49,9 +68,29 @@ function circle(c) {
   var width = ctx.measureText(c.text).width;
   var height = ctx.measureText("w").width;
   ctx.fillText(c.text,c.x-(width/2),c.y+(height/2));
+  if (c.fill == "#FF0000") {
+  canvas_arrow(ctx,c.x,c.y,c.x+50,c.y)
+  }
+  else if (c.fill == "#0000FF") {
+  canvas_arrow(ctx,c.x,c.y,c.x-50,c.y)
+  }
+  ctx.stroke();
 }
 
-// clear the c
+function canvas_arrow(context, fromx, fromy, tox, toy) {
+  var headlen = 10; // length of head in pixels
+  var dx = tox - fromx;
+  var dy = toy - fromy;
+  var angle = Math.atan2(dy, dx);
+  context.moveTo(fromx, fromy);
+  context.lineTo(tox, toy);
+  context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+  context.moveTo(tox, toy);
+  context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+}
+
+
+ //clear the c
 function clear() {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
 }
@@ -65,7 +104,6 @@ function draw() {
     circle(shapes[i]);
     
   }
-  
 }
 // handle mousedown events
 function myDown(e){
@@ -134,26 +172,70 @@ function myMove(e){
     // calculate the distance the mouse has moved
     // since the last mousemove
     var dx=mx-startX;
-    
 
     // move each rect that isDragging 
     // by the distance the mouse has moved
     // since the last mousemove
     for(var i=0;i<shapes.length;i++){
-      var s=shapes[i];
-      if(s.isDragging){
-        s.x+=dx;
-      }
-    }
+		  var s=shapes[i];
+		  if(s.text === "+"){
+			 //2nd shape to compare the center point of both charges
+			 var s2 = shapes[1]; // the negative charge
+		     if(s.isDragging){
+				 //if collision does not happen...
+				if(s.x+60 < s2.x){
+				 s.x+=dx;
+				}
+				//if collision does happen, move the positive charge to the left
+				else{
+				 s.x-=1;
+				}
+			}
+		  }
+		 else{
+		     var s2 = shapes[0]; //the positive charge
+			 if(s.isDragging){
+				 //if collision does not happen...
+				if(s.x-60 > s2.x){
+					s.x+=dx;
+				}	
+				//if collision does happen, move the positive charge to the left
+				else{
+					s.x+=1;
+				}
+			}
+		 }
+	  }
 
     // redraw the scene with the new rect positions
     draw();
-
+	//update distance in HTML
+	distance();
+	
     // reset the starting mouse position for the next mousemove
     startX=mx;
-    
 }
 }
+
+function distance() {
+	var s = shapes[0];
+	var s2 = shapes[1];
+	
+	var dist = (s2.x - s.x-60)/10;
+	document.getElementById("dis").innerHTML = "Distance between charges = " + Math.abs(dist);
+	
+}
+
+function force(charge1,charge2){
+	var s = shapes[0];
+	var s2 = shapes[1];
+	const coulomb = 9000000000;
+	var dist = (s2.x - s.x - 60)/10;
+	
+	var force = (coulomb * charge1 * charge2) / Math.pow(dist,2);
+	document.getElementById("force").innerHTML = "Force between charges = " + force;
+}
+
 </script>
 
 
